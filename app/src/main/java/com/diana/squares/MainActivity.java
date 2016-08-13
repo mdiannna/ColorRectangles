@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     GameMatrix gameMatrix = new GameMatrix();
     TextView timerTextView;
     Button currentColorButton;
+    CountDownTimer timer;
 
     String colors[] = {"#e57373", "#BA68C8", "#F06292"};
     int currentColor = Color.parseColor(colors[0]);
@@ -57,13 +58,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void restartGame(View view) {
-      initGame();
+        timer.cancel();
+        initGame();
     }
 
 
     public void initTimer(){
         timerTextView = (TextView) findViewById( R.id.timer );
-        new CountDownTimer(1*60000, 1000) {
+        timer = new CountDownTimer(1*60000, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 timerTextView.setText("" +new SimpleDateFormat("mm:ss").format(new Date( millisUntilFinished)));
@@ -81,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }.start();
 
+
+
     }
 
     public void initScore(){
@@ -88,55 +92,14 @@ public class MainActivity extends AppCompatActivity {
         changeScore(0);
     }
 
-    ///Code to be optimized///
+
     public void initGameMatrix() {
         int randomColorIndex = 0;
-
-
+        
         gameMatrix.gameCols = gameCols;
         gameMatrix.gameRows = gameRows;
 
         Random randomGenerator = new Random();
-
-
-        Button b1 = (Button) findViewById(R.id.b1);
-        Button b2 = (Button) findViewById(R.id.b2);
-        Button b3 = (Button) findViewById(R.id.b3);
-        Button b4 = (Button) findViewById(R.id.b4);
-        Button b5 = (Button) findViewById(R.id.b5);
-        Button b6 = (Button) findViewById(R.id.b6);
-        Button b7 = (Button) findViewById(R.id.b7);
-        Button b8 = (Button) findViewById(R.id.b8);
-        Button b9 = (Button) findViewById(R.id.b9);
-
-        randomColorIndex = randomGenerator.nextInt(3);
-        b1.setBackgroundColor(Color.parseColor(colors[randomColorIndex]));
-        gameMatrix.setGameValue(findButtonId(b1), randomColorIndex);
-        randomColorIndex = randomGenerator.nextInt(3);
-        b2.setBackgroundColor(Color.parseColor(colors[randomColorIndex]));
-        gameMatrix.setGameValue(findButtonId(b2), randomColorIndex);
-        randomColorIndex = randomGenerator.nextInt(3);
-        b3.setBackgroundColor(Color.parseColor(colors[randomColorIndex]));
-        gameMatrix.setGameValue(findButtonId(b3), randomColorIndex);
-        randomColorIndex = randomGenerator.nextInt(3);
-        b4.setBackgroundColor(Color.parseColor(colors[randomColorIndex]));
-        gameMatrix.setGameValue(findButtonId(b4), randomColorIndex);
-        randomColorIndex = randomGenerator.nextInt(3);
-        b5.setBackgroundColor(Color.parseColor(colors[randomColorIndex]));
-        gameMatrix.setGameValue(findButtonId(b5), randomColorIndex);
-        randomColorIndex = randomGenerator.nextInt(3);
-        b6.setBackgroundColor(Color.parseColor(colors[randomColorIndex]));
-        gameMatrix.setGameValue(findButtonId(b6), randomColorIndex);
-        randomColorIndex = randomGenerator.nextInt(3);
-        b7.setBackgroundColor(Color.parseColor(colors[randomColorIndex]));
-        gameMatrix.setGameValue(findButtonId(b7), randomColorIndex);
-        randomColorIndex = randomGenerator.nextInt(3);
-        b8.setBackgroundColor(Color.parseColor(colors[randomColorIndex]));
-        gameMatrix.setGameValue(findButtonId(b8), randomColorIndex);
-        randomColorIndex = randomGenerator.nextInt(3);
-        b9.setBackgroundColor(Color.parseColor(colors[randomColorIndex]));
-        gameMatrix.setGameValue(findButtonId(b9), randomColorIndex);
-
 
 
         for(int i=1; i<=9; i++){
@@ -144,17 +107,13 @@ public class MainActivity extends AppCompatActivity {
             Button b = (Button) findViewById(resId);
             b.setText("");
             b.setClickable(true);
+            randomColorIndex = randomGenerator.nextInt(3);
+            b.setBackgroundColor(Color.parseColor(colors[randomColorIndex]));
+            gameMatrix.setGameValue(findButtonId(b), randomColorIndex);
         }
 
-//        for(int i=0; i<gameRows; i++){
-//            for(int j=0; j<gameCols; j++){
-//                randomColor = randomGenerator.nextInt(3);
-//                gameMatrix.Game[i][j] = randomColor;
-//                gameMatrix.setGameValue(i, j, randomColor);
-//                int id = i*gameCols + j+1;
-//                Button b = (Button) findViewById("");
-//            }
-//        }
+        checkFullSquares();
+
         Log.v(TAG, "Game init");
     }
 
