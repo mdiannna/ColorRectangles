@@ -14,6 +14,7 @@ package com.diana.squares;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.graphics.Color;
 import android.util.Log;
@@ -21,13 +22,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 
 public class MainActivity extends AppCompatActivity {
     public static String TAG = "--MyDEBUG--";
     GameMatrix gameMatrix = new GameMatrix();
+    TextView timerTextView;
     Button currentColorButton;
+
     String colors[] = {"#e57373", "#BA68C8", "#F06292"};
     int currentColor = Color.parseColor(colors[0]);
     int currentColorIndex = 0;
@@ -41,6 +46,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initGameMatrix();
         initScore();
+
+
+        timerTextView = (TextView) findViewById( R.id.timer );
+        new CountDownTimer(1*60000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                timerTextView.setText("" +new SimpleDateFormat("mm:ss").format(new Date( millisUntilFinished)));
+//                timerTextView.setText(" " +new SimpleDateFormat("mm:ss:SS").format(new Date( millisUntilFinished)));
+            }
+
+            public void onFinish() {
+                timerTextView.setText("done!");
+
+                for(int i=1; i<=9; i++){
+                    int resId = getResources().getIdentifier("b" + i, "id", getPackageName());
+                    Button b = (Button) findViewById(resId);
+                    b.setClickable(false);
+                }
+            }
+        }.start();
+
     }
 
     public void initScore(){
@@ -57,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         gameMatrix.gameRows = gameRows;
 
         Random randomGenerator = new Random();
+
 
         Button b1 = (Button) findViewById(R.id.b1);
         Button b2 = (Button) findViewById(R.id.b2);
@@ -204,3 +231,5 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+
+

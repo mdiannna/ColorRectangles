@@ -7,23 +7,56 @@
     android:background="#ffffff"
     tools:context="com.diana.squares.MainActivity">
 
-
     <LinearLayout
         android:id="@+id/scoreLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight=".10"
-        android:background="#D81B60">
+        android:background="#D81B60"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:gravity="center"
+        >
+
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="wrap_content">
+        </LinearLayout>
+
+    <TextView
+        android:id="@+id/score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="Score: 0"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#FFFFFF"
+        android:layout_gravity="center" />
+
+        <LinearLayout
+            android:layout_width="30dp"
+            android:layout_height="wrap_content">
+        </LinearLayout>
+
+        <ImageButton
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/timer"
+            android:onClick="restartGame"
+            android:layout_gravity="right"
+            android:scaleType="centerInside"
+            android:background="#D81B60"
+            android:padding="5dp"/>
 
         <TextView
-            android:id="@+id/score"
-            android:layout_width="match_parent"
+            android:id="@+id/timer"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="Score: 0"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="#FFFFFF"/>
-    </LinearLayout>
+            android:gravity="right"
+            android:text="Timer:"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center" />
+</LinearLayout>
 
     <TableLayout
         android:layout_width="match_parent"
