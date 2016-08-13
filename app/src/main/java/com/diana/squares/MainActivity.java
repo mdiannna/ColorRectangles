@@ -44,10 +44,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        initGame();
+    }
+
+
+    public void initGame(){
         initGameMatrix();
         initScore();
+        initTimer();
+    }
 
 
+    public void restartGame(View view) {
+      initGame();
+    }
+
+
+    public void initTimer(){
         timerTextView = (TextView) findViewById( R.id.timer );
         new CountDownTimer(1*60000, 1000) {
 
@@ -129,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
             int resId = getResources().getIdentifier("b" + i, "id", getPackageName());
             Button b = (Button) findViewById(resId);
             b.setText("");
+            b.setClickable(true);
         }
 
 //        for(int i=0; i<gameRows; i++){
@@ -144,9 +159,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void restartGame(View view) {
-        initGameMatrix(); initScore();
-    }
+
 
     public int generateRandomColorIndex() {
         Random randomGenerator = new Random();
