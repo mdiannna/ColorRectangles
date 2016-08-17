@@ -18,9 +18,13 @@ import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,40 +38,128 @@ public class MainActivity extends AppCompatActivity {
     Button currentColorButton;
     CountDownTimer timer;
 
+    Toast finalMessage = null;
+
     String colors[] = {"#e57373", "#BA68C8", "#F06292"};
     int currentColor = Color.parseColor(colors[0]);
     int currentColorIndex = 0;
     int gameCols = 3;
     int gameRows = 3;
     int score = 0;
+    long milliseconds;
+
+    final static long TIME_FOR_GAME = 1*30000;
+
+    final static int GAME_SHOULD_START = 0;
+    final static int GAME_IN_PROGRESS = 1;
+    final static int GAME_IS_FINISHED = 2;
+    int gameStatus = GAME_SHOULD_START;
+
+    final static String GAME_STATUS = "gameStatus";
+    final static String SCORE = "score";
+    final static String TIME = "time";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initGame();
+
+
+        if(savedInstanceState == null){
+            initGame();
+            gameStatus = GAME_IN_PROGRESS;
+        }
+        else {
+            gameStatus = savedInstanceState.getInt(GAME_STATUS);
+            initGameMatrix();
+            initToast();
+            if (gameStatus == GAME_IS_FINISHED){
+                showFinalMessage();
+                initTimer(0);
+            }
+            else{
+                milliseconds = savedInstanceState.getLong(TIME)-1;
+                initTimer(milliseconds);
+            }
+
+
+            score = savedInstanceState.getInt(SCORE);
+
+            initScore(score);
+
+        }
+        Log.d(TAG, "onCreate: gameStatus-" + gameStatus);
+    }
+
+    protected void onSaveInstanceState(Bundle savedInstanceState){
+        savedInstanceState.putInt(GAME_STATUS, gameStatus);
+        savedInstanceState.putInt(SCORE,score);
+        savedInstanceState.putLong(TIME, milliseconds);
+//        savedInstanceState.putInt(TIMER,timer_sec);
+        //save timer
+        // save matrix
+        hideFinalMessage();
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+
+    protected void onPause(){
+        super.onPause();
+
+        hideFinalMessage();
+    }
+
+
+    protected void onStop(){
+        super.onStop();
+        hideFinalMessage();
     }
 
 
     public void initGame(){
         initGameMatrix();
         initScore();
-        initTimer();
+        initTimer(TIME_FOR_GAME);
+        initToast();
+        gameStatus = GAME_IN_PROGRESS;
     }
 
 
     public void restartGame(View view) {
-        timer.cancel();
+        hideFinalMessage();
+        stopTimer();
         initGame();
     }
 
 
-    public void initTimer(){
-        timerTextView = (TextView) findViewById( R.id.timer );
-        timer = new CountDownTimer(1*60000, 1000) {
+    public void initToast(){
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.final_message_layout,
+                (ViewGroup) findViewById(R.id.custom_toast_container));
+
+        TextView text = (TextView) layout.findViewById(R.id.text);
+        text.setText("Your score is " + score);
+
+        finalMessage = new Toast(getApplicationContext());
+        finalMessage.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+        finalMessage.setDuration(Toast.LENGTH_LONG);
+        finalMessage.setView(layout);
+    }
+
+    public void initTimerTextView(){
+    timerTextView = (TextView) findViewById( R.id.timer );
+}
+
+    public void initTimer(long initialMilliseconds){
+       initTimerTextView();
+
+        timer = new CountDownTimer(initialMilliseconds, 1000) {
 
             public void onTick(long millisUntilFinished) {
+                milliseconds = millisUntilFinished;
                 timerTextView.setText("" +new SimpleDateFormat("mm:ss").format(new Date( millisUntilFinished)));
 //                timerTextView.setText(" " +new SimpleDateFormat("mm:ss:SS").format(new Date( millisUntilFinished)));
             }
@@ -79,23 +171,36 @@ public class MainActivity extends AppCompatActivity {
                     int resId = getResources().getIdentifier("b" + i, "id", getPackageName());
                     Button b = (Button) findViewById(resId);
                     b.setClickable(false);
+
+                    gameStatus = GAME_IS_FINISHED;
+                    showFinalMessage();
                 }
             }
         }.start();
-
-
-
     }
+
+
+    public void stopTimer(){
+        timer.cancel();
+    }
+
+
 
     public void initScore(){
         score = 0;
         changeScore(0);
     }
 
+    public void initScore(int init_score){
+        score = 0;
+        changeScore(init_score);
+    }
+
+
 
     public void initGameMatrix() {
         int randomColorIndex = 0;
-        
+
         gameMatrix.gameCols = gameCols;
         gameMatrix.gameRows = gameRows;
 
@@ -161,7 +266,6 @@ public class MainActivity extends AppCompatActivity {
         Button b = (Button) findViewById(resId);
 
         gameMatrix.Game[i][j] = colorIndex;
-//        b.setBackgroundColor(Color.parseColor("#FFFFFF"));
         b.setBackgroundColor(Color.parseColor(colors[colorIndex]));
     }
 
@@ -196,6 +300,17 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+public void showFinalMessage(){
+
+    finalMessage.show();
+
+}
+
+    public void hideFinalMessage(){
+        //if(finalMessage!=null)
+            finalMessage.cancel();
+
+    }
 
     public void startHowToActivity(View view){
         Intent intent = new Intent(this, HowToActivity.class);
