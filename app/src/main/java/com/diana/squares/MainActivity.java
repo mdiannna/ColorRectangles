@@ -11,6 +11,8 @@ PLEASE FOLLOW THIS CONVENTION IN ORDER FOR GAME TO WORK PROPERLY
 ------------------------------------------------------*/
 package com.diana.squares;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -23,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +41,9 @@ public class MainActivity extends AppCompatActivity {
     Button currentColorButton;
     CountDownTimer timer;
 
-    Toast finalMessage = null;
+    private Toast finalMessage = null;
+    final Context context = this;
+    Dialog dialog = null;
 
     String colors[] = {"#e57373", "#BA68C8", "#F06292"};
     int currentColor = Color.parseColor(colors[0]);
@@ -132,6 +137,12 @@ public class MainActivity extends AppCompatActivity {
         hideFinalMessage();
         stopTimer();
         initGame();
+        gameStatus = GAME_IN_PROGRESS;
+//
+//        Intent intent = getIntent();
+//        finish();
+//        startActivity(intent);
+        Toast.makeText(MainActivity.this, "Game restarted!", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -140,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
         View layout = inflater.inflate(R.layout.final_message_layout,
                 (ViewGroup) findViewById(R.id.custom_toast_container));
 
+        //Should include more diverse message as "Awesome! You score is"
+        //"I bet you can do better/"
         TextView text = (TextView) layout.findViewById(R.id.text);
         text.setText("Your score is " + score);
 
@@ -171,10 +184,9 @@ public class MainActivity extends AppCompatActivity {
                     int resId = getResources().getIdentifier("b" + i, "id", getPackageName());
                     Button b = (Button) findViewById(resId);
                     b.setClickable(false);
-
-                    gameStatus = GAME_IS_FINISHED;
-                    showFinalMessage();
                 }
+                gameStatus = GAME_IS_FINISHED;
+                showFinalMessage();
             }
         }.start();
     }
@@ -301,8 +313,22 @@ public class MainActivity extends AppCompatActivity {
 
 
 public void showFinalMessage(){
+//    LayoutInflater inflater = getLayoutInflater();
+//
+//    View layout = inflater.inflate(R.layout.final_message_layout,
+//            (ViewGroup) findViewById(R.id.custom_toast_container));
+//
+//    //Should include more diverse message as "Awesome! You score is"
+//    //"I bet you can do better/"
+//    TextView text = (TextView) layout.findViewById(R.id.text);
+//    text.setText("Your score is " + score);
+//
+//    finalMessage.setView(layout);
+//
+//
+//    finalMessage.show();
 
-    finalMessage.show();
+    showScore();
 
 }
 
@@ -316,6 +342,47 @@ public void showFinalMessage(){
         Intent intent = new Intent(this, HowToActivity.class);
         startActivity(intent);
     }
+
+    public void startGameActivity(View view){
+        restartGame(view);
+    }
+
+
+    public void showScore(){
+        // custom dialog
+       dialog = new Dialog(context);
+        dialog.setContentView(R.layout.final_message_layout);
+        dialog.setTitle("Title...");
+
+        //Should include more diverse message as "Awesome! You score is"
+        //"I bet you can do better/"
+        TextView text = (TextView) dialog.findViewById(R.id.text);
+        text.setText("Your score is " + score);
+
+
+        final Button dialogButton = (Button) dialog.findViewById(R.id.try_again);
+        // if button is clicked, close the custom dialog
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                restartGame(dialogButton);
+                dialog.dismiss();
+                gameStatus = GAME_SHOULD_START;
+
+            }
+        });
+
+
+
+        if(gameStatus == GAME_IS_FINISHED) {
+            dialog.show();
+            gameStatus = GAME_SHOULD_START;
+        }
+        else
+            dialog.dismiss();
+    }
+
 
 }
 
