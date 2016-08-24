@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
         initScore();
         initTimer(TIME_FOR_GAME);
         initToast();
+        initDialog();
         gameStatus = GAME_IN_PROGRESS;
     }
 
@@ -137,6 +138,8 @@ public class MainActivity extends AppCompatActivity {
         hideFinalMessage();
         stopTimer();
         initGame();
+        if(dialog!=null)
+            dialog.dismiss();
         gameStatus = GAME_IN_PROGRESS;
 //
 //        Intent intent = getIntent();
@@ -188,7 +191,9 @@ public class MainActivity extends AppCompatActivity {
                 gameStatus = GAME_IS_FINISHED;
                 showFinalMessage();
             }
-        }.start();
+        };
+        timer.start();
+
     }
 
 
@@ -335,6 +340,8 @@ public void showFinalMessage(){
     public void hideFinalMessage(){
         //if(finalMessage!=null)
             finalMessage.cancel();
+        if(dialog!=null)
+            dialog.dismiss();
 
     }
 
@@ -348,32 +355,40 @@ public void showFinalMessage(){
     }
 
 
-    public void showScore(){
-        // custom dialog
-       dialog = new Dialog(context);
-        dialog.setContentView(R.layout.final_message_layout);
-        dialog.setTitle("Title...");
+    public void initDialog(){
+            // custom dialog
+            dialog = new Dialog(context);
+            dialog.setContentView(R.layout.final_message_layout);
+            dialog.setTitle("Title...");
 
-        //Should include more diverse message as "Awesome! You score is"
-        //"I bet you can do better/"
+            //Should include more diverse message as "Awesome! You score is"
+            //"I bet you can do better/"
+            TextView text = (TextView) dialog.findViewById(R.id.text);
+            text.setText("Your score is " + score);
+
+
+            final Button dialogButton = (Button) dialog.findViewById(R.id.try_again);
+            // if button is clicked, close the custom dialog
+            dialogButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    restartGame(dialogButton);
+                    dialog.dismiss();
+                    gameStatus = GAME_SHOULD_START;
+
+                }
+            });
+
+    }
+
+
+    public void showScore(){
+
         TextView text = (TextView) dialog.findViewById(R.id.text);
         text.setText("Your score is " + score);
 
-
-        final Button dialogButton = (Button) dialog.findViewById(R.id.try_again);
-        // if button is clicked, close the custom dialog
-        dialogButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                restartGame(dialogButton);
-                dialog.dismiss();
-                gameStatus = GAME_SHOULD_START;
-
-            }
-        });
-
-
+//        dialog.show();
 
         if(gameStatus == GAME_IS_FINISHED) {
             dialog.show();
