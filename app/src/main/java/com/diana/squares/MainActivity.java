@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     int score = 0;
     long milliseconds;
 
-    final static long TIME_FOR_GAME = 1*30000;
+    final static long TIME_FOR_GAME = 2*60000;
 
     final static int GAME_SHOULD_START = 0;
     final static int GAME_IN_PROGRESS = 1;
